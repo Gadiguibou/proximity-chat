@@ -73,30 +73,37 @@ export default function App() {
     });
 
     socket.on("local message", (message: UserMessage) => {
-      let nextMessages = {...messages};
+      let nextMessages = { ...messages };
       // console.log(JSON.stringify(nextMessages));
-      if (message.id in nextMessages && nextMessages[message.id] === message.message) {
-        return
+      if (
+        message.id in nextMessages &&
+        nextMessages[message.id] === message.message
+      ) {
+        return;
       } else {
         nextMessages[message.id] = message.message;
-        console.log("allmsgs", nextMessages)
+        console.log("allmsgs", nextMessages);
         setMessages(nextMessages);
-        clearMessageTimer({...message})
+        clearMessageTimer({ ...message });
       }
-    })
-  }, [])
+    });
+  }, []);
 
   const clearMessageTimer = (mes: UserMessage) => {
-    setTimeout(() => {
-      console.log("clear msg: " , mes)
-      let nextMessages = {...messages};
-      if (nextMessages[mes.id] === mes.message) {
-        delete nextMessages[mes.id];
-        setMessages(nextMessages);
-      }
-      setMessages({}); // Clears all messages, leaving it there for now
-    }, 7000, mes);
-  }
+    setTimeout(
+      () => {
+        console.log("clear msg: ", mes);
+        let nextMessages = { ...messages };
+        if (nextMessages[mes.id] === mes.message) {
+          delete nextMessages[mes.id];
+          setMessages(nextMessages);
+        }
+        setMessages({}); // Clears all messages, leaving it there for now
+      },
+      7000,
+      mes
+    );
+  };
 
   const toEmoji = (name: String): String => {
     const key =
@@ -123,6 +130,7 @@ export default function App() {
     green: "#20ba39",
     blue: "#128ff7",
   };
+  const [focus, setFocus] = useState(false);
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -138,19 +146,31 @@ export default function App() {
       flexBasis: "auto",
     },
     inputContainer: {
+      borderTopColor: "#eee",
+      borderTopWidth: 1,
       flexDirection: "row",
       justifyContent: "space-around",
       alignItems: "center",
     },
-    input: {
-      flex: 1,
-      height: 40,
-      paddingHorizontal: 12,
-      margin: 10,
-      borderColor: "#777777",
-      borderWidth: 1,
-      borderRadius: 20,
-    },
+    input: focus
+      ? {
+          flex: 1,
+          height: 40,
+          paddingHorizontal: 12,
+          margin: 10,
+          borderRadius: 20,
+          borderColor: colors.blue,
+          borderWidth: 2,
+        }
+      : {
+          flex: 1,
+          height: 40,
+          paddingHorizontal: 12,
+          margin: 10,
+          borderRadius: 20,
+          borderColor: "#ccc",
+          borderWidth: 1,
+        },
     nameInput: {
       borderBottomColor: colors.blue,
       borderBottomWidth: 2,
@@ -292,6 +312,8 @@ export default function App() {
                   placeholder="Send a message"
                   onChangeText={setText}
                   style={styles.input}
+                  onFocus={() => setFocus(true)}
+                  onBlur={() => setFocus(false)}
                 />
                 <Button
                   disabled={text.trim().length === 0}
