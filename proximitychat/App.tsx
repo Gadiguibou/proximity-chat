@@ -75,48 +75,28 @@ export default function App() {
     socket.on("local message", (message: UserMessage) => {
       let nextMessages = {...messages};
       // console.log(JSON.stringify(nextMessages));
-      nextMessages[message.id] =  message.message;
-      console.log("allmsgs", nextMessages)
-      setMessages(nextMessages);
-      // console.log(JSON.stringify(messages));
-      clearMessageTimer({...message})
+      if (message.id in nextMessages && nextMessages[message.id] === message.message) {
+        return
+      } else {
+        nextMessages[message.id] = message.message;
+        console.log("allmsgs", nextMessages)
+        setMessages(nextMessages);
+        clearMessageTimer({...message})
+      }
     })
   }, [])
 
   const clearMessageTimer = (mes: UserMessage) => {
     setTimeout(() => {
       console.log("clear msg: " , mes)
-      // let nextMessages = {...messages};
-      // if (nextMessages[mes.id] == mes.message) {
-      //   delete nextMessages[mes.id];
-        // setMessages(nextMessages);
-      // }
-      setMessages({})
-    }, 5000, mes);
-  }
-
-  socket.on("local message", (message: UserMessage) => {
-    let nextMessages = { ...messages };
-    // console.log(JSON.stringify(nextMessages));
-    nextMessages[message.id] = message.message;
-    // console.log(nextMessages)
-    setMessages(nextMessages);
-    console.log(JSON.stringify(messages));
-    setTimeout(() => {
-      let nextMessages = { ...messages };
-      if (nextMessages[message.id] === message.message) {
-        delete nextMessages[message.id];
+      let nextMessages = {...messages};
+      if (nextMessages[mes.id] === mes.message) {
+        delete nextMessages[mes.id];
         setMessages(nextMessages);
-        console.log(JSON.stringify(messages));
       }
-    }, 15000);
-  });
-
-  // setSocket(nsocket)
-  // socket.on("locations", (locations: UserInfo[]) => {
-  //   console.log(locations)
-  //   setUsers(locations);
-  // });
+      setMessages({})
+    }, 7000, mes);
+  }
 
   const toEmoji = (name: String): String => {
     const key =
@@ -129,13 +109,13 @@ export default function App() {
     if (text.trim().length > 0) {
       socket.emit("local message", name, text, (response: any) => {
         // What's up with this callback?
-        console.log(`emit response ${response}`);
+        // console.log(`emit response ${response.status}`);
       });
       setOwnMessage(text);
       setText("");
       setTimeout(() => {
         setOwnMessage("");
-      }, 15000);
+      }, 7000);
     }
   };
 
