@@ -8,6 +8,7 @@ app.get("/", (req, res) => {
 });
 
 let users = {};
+let hbeatTimeouts = {};
 
 const getDistanceInDegrees = (lat1, lon1, lat2, lon2) => {
   return Math.sqrt((lat2 - lat1) ** 2 + (lon2 - lon1) ** 2);
@@ -54,6 +55,18 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("heartbeat", (name) => {
+    console.log(`${name} is alive`);
+    const timeout = hbeatTimeouts[name];
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    hbeatTimeouts[name] = setTimeout(() => {
+      console.log(`User with id ${name} timed out`);
+      delete users[name];
+    }, 15000);
+  });
+  
   socket.on("location", (name, { latitude, longitude }) => {
     console.log(name, latitude, longitude);
     users[name] = { latitude, longitude };
@@ -61,6 +74,7 @@ io.on("connection", (socket) => {
       `User with id ${name} reported position: ${latitude}, ${longitude}`
     );
   });
+
 });
 
 const interval = setInterval(async () => {

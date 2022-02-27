@@ -65,6 +65,10 @@ export default function App() {
         }
       );
     });
+    const heartbeatIntervalId = setInterval(() => {
+      console.log("heartbeat");
+      socket.emit("heartbeat", name);
+    }, 5000);
   };
 
   useEffect(() => {
