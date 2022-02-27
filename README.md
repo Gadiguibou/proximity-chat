@@ -1,4 +1,4 @@
-# proximity-chat
+# ChatArea
 
 Link to Devpost: [here](https://github.com/Gadiguibou/proximity-chat)
 
