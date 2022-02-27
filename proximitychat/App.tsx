@@ -16,9 +16,12 @@ import { Chip, Modal, Button, Portal, Provider } from "react-native-paper";
 import io, { Socket } from "socket.io-client";
 import * as GeoLocation from "expo-location";
 import emojis from "./Emojis";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
-  const [socket, setSocket] = useState<Socket>(io("http://localhost:3000/"));
+  const [socket, setSocket] = useState<Socket>(
+    io("http://proximitychat.glcrx.com", { transports: ["websocket"] })
+  );
   // io("http://localhost:3000/", {transports: ['websocket']})
 
   const [visible, setModalVisibility] = React.useState(true);
@@ -37,20 +40,10 @@ export default function App() {
     longitudeDelta: 0.00011,
   });
   const containerStyle = { backgroundColor: "white", padding: 20 };
-  
+
   const startMap = async () => {
     setModalVisibility(false);
-  };
-
-  useEffect(() => {
-    setSocket(io("http://localhost:3000/"))
-    socket.on("locations", (locations: UserInfo[]) => {
-      console.log(locations)
-      setUsers(locations);
-    });
-
-    GeoLocation.requestForegroundPermissionsAsync()
-    .then(({status}) => {
+    GeoLocation.requestForegroundPermissionsAsync().then(({ status }) => {
       if (status !== "granted") {
         console.warn("Permission to access location was denied");
         return;
@@ -71,25 +64,32 @@ export default function App() {
           });
         }
       );
-    })
+    });
+  };
 
-    // setSocket(nsocket)
-    // socket.on("locations", (locations: UserInfo[]) => {
-    //   console.log(locations)
-    //   setUsers(locations);
-    // });
+  socket.on("locations", (locations: UserInfo[]) => {
+    console.log(locations);
+    setUsers(locations);
+  });
 
-  }, [])
+  // setSocket(nsocket)
+  // socket.on("locations", (locations: UserInfo[]) => {
+  //   console.log(locations)
+  //   setUsers(locations);
+  // });
 
   const toEmoji = (name: String): String => {
-    const key = name.split("").reduce((acc, c) => c.charCodeAt(0) * acc, 1) % emojis.length
-    return emojis[key]
-  }
+    const key =
+      name.split("").reduce((acc, c) => c.charCodeAt(0) * acc, 1) %
+      emojis.length;
+    return emojis[key];
+  };
 
   const handleSendMessage = () => {
     if (text.trim().length > 0) {
       socket.emit("local message", name, text, (response: any) => {
-        console.log(`emit response ${response}`)
+        // What's up with this callback?
+        console.log(`emit response ${response}`);
       });
       setOwnMessage(text);
       setText("");
@@ -109,8 +109,8 @@ export default function App() {
       justifyContent: "flex-start",
     },
     map: {
-      flexGrow: 1,
-      flexShrink: 1,
+      flexGrow: 10,
+      flexShrink: 0,
       flexBasis: "auto",
     },
     inputContainer: {
@@ -157,6 +157,8 @@ export default function App() {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={-400}
+        enabled
         style={styles.container}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -196,35 +198,36 @@ export default function App() {
                   </Marker>
                 </View>
               )}
-              {users.map((user: UserInfo, index: number) => (
-                <View key={index}>
-                  <Marker
-                    coordinate={{
-                      latitude: user.location.latitude,
-                      longitude: user.location.longitude,
-                    }}
-                    style={{ justifyContent: "center", alignItems: "center" }}
-                  >
-                    {messages[user.id] ? (
-                      <View
-                        style={{
-                          left: -25,
-                          backgroundColor: "#fefefe",
-                          borderRadius: 12,
-                          padding: 5,
-                        }}
-                      >
-                        <Text numberOfLines={5} style={{ maxWidth: 100 }}>
-                          {messages[user.id]}
-                        </Text>
-                      </View>
-                    ) : (
-                      <View></View>
-                    )}
-                  </Marker>
-                  <Text style={{ fontSize: 35 }}>{toEmoji(user.id)}</Text>
-                </View>
-              ))}
+              {users
+                .filter((user: UserInfo) => user.id !== name)
+                .map((user: UserInfo, index: number) => (
+                  <View key={index}>
+                    <Marker
+                      coordinate={{
+                        latitude: user.location.latitude,
+                        longitude: user.location.longitude,
+                      }}
+                      style={{ justifyContent: "center", alignItems: "center" }}
+                    >
+                      {messages[user.id] ? (
+                        <View
+                          style={{
+                            backgroundColor: "#fefefe",
+                            borderRadius: 12,
+                            padding: 5,
+                          }}
+                        >
+                          <Text numberOfLines={5} style={{ maxWidth: 100 }}>
+                            {messages[user.id]}
+                          </Text>
+                        </View>
+                      ) : (
+                        <View></View>
+                      )}
+                      <Text style={{ fontSize: 35 }}>{toEmoji(user.id)}</Text>
+                    </Marker>
+                  </View>
+                ))}
             </MapView>
             <View>
               <View style={styles.inputContainer}>
