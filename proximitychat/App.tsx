@@ -95,6 +95,23 @@ export default function App() {
     }, 5000, mes);
   }
 
+  socket.on("local message", (message: UserMessage) => {
+    let nextMessages = { ...messages };
+    // console.log(JSON.stringify(nextMessages));
+    nextMessages[message.id] = message.message;
+    // console.log(nextMessages)
+    setMessages(nextMessages);
+    console.log(JSON.stringify(messages));
+    setTimeout(() => {
+      let nextMessages = { ...messages };
+      if (nextMessages[message.id] === message.message) {
+        delete nextMessages[message.id];
+        setMessages(nextMessages);
+        console.log(JSON.stringify(messages));
+      }
+    }, 15000);
+  });
+
   // setSocket(nsocket)
   // socket.on("locations", (locations: UserInfo[]) => {
   //   console.log(locations)
