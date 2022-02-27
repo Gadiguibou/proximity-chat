@@ -144,6 +144,13 @@ export default function App() {
       borderWidth: 1,
       borderRadius: 20,
     },
+    nameInput: {
+      borderBottomColor: "#128ff7",
+      borderBottomWidth: 2,
+      fontSize: 16,
+      height: 30,
+      margin: 10,
+    },
     sendButton: {},
   });
   if (notSet) {
@@ -156,15 +163,37 @@ export default function App() {
             onDismiss={startMap}
             contentContainerStyle={containerStyle}
           >
-            <TextInput onChangeText={(textName) => setName(textName)} />
+            <Text style={{ fontSize: 16, textAlign: "center" }}>
+              Welcome to{" "}
+              <Text style={{ fontWeight: "bold" }}>
+                <Text style={{ color: "#128ff7" }}>Chat</Text>
+                <Text style={{ color: "#20ba39" }}>Area</Text>
+              </Text>
+              ! 🌎 💬
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                textAlign: "center",
+                paddingHorizontal: 20,
+              }}
+            >
+              Enter your name to start chatting with others nearby!
+            </Text>
+            <TextInput
+              style={styles.nameInput}
+              selectionColor="#20ba39"
+              onChangeText={(textName) => setName(textName)}
+            />
             <Button
               mode="contained"
               onPress={() => {
                 setNotSet(false);
                 startMap();
               }}
+              style={{ backgroundColor: "#20ba39" }}
             >
-              Chat
+              Start chatting
             </Button>
           </Modal>
         </Portal>
