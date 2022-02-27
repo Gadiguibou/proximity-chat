@@ -36,8 +36,8 @@ export default function App() {
   const [mapRegion, setMapRegion] = useState({
     latitude: 37.78825,
     longitude: -122.4324,
-    latitudeDelta: 0.0024,
-    longitudeDelta: 0.00011,
+    latitudeDelta: 0.0044,
+    longitudeDelta: 0.00021,
   });
   const containerStyle = { backgroundColor: "white", padding: 20 };
 
@@ -67,10 +67,33 @@ export default function App() {
     });
   };
 
-  socket.on("locations", (locations: UserInfo[]) => {
-    console.log(locations);
-    setUsers(locations);
-  });
+  useEffect(() => {
+    socket.on("locations", (locations: UserInfo[]) => {
+      setUsers(locations);
+    });
+
+    socket.on("local message", (message: UserMessage) => {
+      let nextMessages = {...messages};
+      // console.log(JSON.stringify(nextMessages));
+      nextMessages[message.id] =  message.message;
+      console.log("allmsgs", nextMessages)
+      setMessages(nextMessages);
+      // console.log(JSON.stringify(messages));
+      clearMessageTimer({...message})
+    })
+  }, [])
+
+  const clearMessageTimer = (mes: UserMessage) => {
+    setTimeout(() => {
+      console.log("clear msg: " , mes)
+      // let nextMessages = {...messages};
+      // if (nextMessages[mes.id] == mes.message) {
+      //   delete nextMessages[mes.id];
+        // setMessages(nextMessages);
+      // }
+      setMessages({})
+    }, 5000, mes);
+  }
 
   // setSocket(nsocket)
   // socket.on("locations", (locations: UserInfo[]) => {
