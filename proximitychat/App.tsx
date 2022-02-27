@@ -116,6 +116,10 @@ export default function App() {
     }
   };
 
+  const colors = {
+    green: "#20ba39",
+    blue: "#128ff7",
+  };
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -145,13 +149,15 @@ export default function App() {
       borderRadius: 20,
     },
     nameInput: {
-      borderBottomColor: "#128ff7",
+      borderBottomColor: colors.blue,
       borderBottomWidth: 2,
       fontSize: 16,
       height: 30,
       margin: 10,
     },
-    sendButton: {},
+    button: {
+      borderRadius: 20,
+    },
   });
   if (notSet) {
     return (
@@ -166,8 +172,8 @@ export default function App() {
             <Text style={{ fontSize: 16, textAlign: "center" }}>
               Welcome to{" "}
               <Text style={{ fontWeight: "bold" }}>
-                <Text style={{ color: "#128ff7" }}>Chat</Text>
-                <Text style={{ color: "#20ba39" }}>Area</Text>
+                <Text style={{ color: colors.blue }}>Chat</Text>
+                <Text style={{ color: colors.green }}>Area</Text>
               </Text>
               ! 🌎 💬
             </Text>
@@ -182,7 +188,7 @@ export default function App() {
             </Text>
             <TextInput
               style={styles.nameInput}
-              selectionColor="#20ba39"
+              selectionColor={colors.green}
               onChangeText={(textName) => setName(textName)}
             />
             <Button
@@ -191,7 +197,8 @@ export default function App() {
                 setNotSet(false);
                 startMap();
               }}
-              style={{ backgroundColor: "#20ba39" }}
+              style={styles.button}
+              color={colors.green}
             >
               Start chatting
             </Button>
@@ -286,8 +293,10 @@ export default function App() {
                 <Button
                   disabled={text.trim().length === 0}
                   onPress={handleSendMessage}
+                  style={styles.button}
+                  color={colors.green}
                 >
-                  Go
+                  Send
                 </Button>
                 <View style={{ width: 10 }}></View>
               </View>
